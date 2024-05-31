@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build:
-    name: Kernel Builder
+  setup:
+    name: Setup Builder Env
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -39,6 +39,10 @@ jobs:
           cd kernel 
           sed -i 's/^CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="-Black"/' arch/arm64/configs/lava_defconfig
 
+  build:
+    name: Execute Build
+    runs-on: ubuntu-latest
+    steps:
       - name: Build
         run: |
           cd kernel
@@ -47,6 +51,10 @@ jobs:
           echo "Building kernel"
           ./build.sh
 
+  release:
+    name: Release Kernel
+    runs-on: ubuntu-latest
+    steps:
       - name: Extract Version Info
         id: extract_version_info
         run: |
@@ -67,13 +75,12 @@ jobs:
           echo "- Kernel Name: ${{ env.KERNEL_NAME }}" >> release_notes.txt
           echo "- Version: ${{ env.VERSION }}" >> release_notes.txt
           echo "- Device: ${{ env.DEVICE }}" >> release_notes.txt
-          echo "- Add any other relevant changes or notes here" >> release_notes.txt
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: kernel/builds/*.zip
-          tag: "${{ env.VERSION }}"
-          name: "Release ${{ env.VERSION }}"
+          tag: "${{ github.run_number }}"
+          name: "Release ${{ env.VERSION }} - ${{ github.run_number }}"
           token: ${{ secrets.PAT_TOKEN }}
           bodyFile: release_notes.txt
