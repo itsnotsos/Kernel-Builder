@@ -1,9 +1,7 @@
 name: Kernel Builder
 
 on:
-  push:
-    branches:
-      - raider
+  workflow_dispatch:
 
 jobs:
   build:
@@ -51,9 +49,9 @@ jobs:
         id: extract_version_info
         run: |
           FILE_NAME=$(basename kernel/builds/*.zip)
-          KERNEL_NAME=$(echo $FILE_NAME | cut -d'-' -f4)
-          VERSION=$(echo $FILE_NAME | cut -d'-' -f5)
-          DEVICE=$(echo $FILE_NAME | cut -d'-' -f6)
+          KERNEL_NAME=$(echo $FILE_NAME | cut -d'-' -f3)
+          VERSION=$(echo $FILE_NAME | cut -d'-' -f4)
+          DEVICE=$(echo $FILE_NAME | cut -d'-' -f5)
           echo "KERNEL_NAME=${KERNEL_NAME}" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "DEVICE=${DEVICE}" >> $GITHUB_ENV
@@ -63,7 +61,6 @@ jobs:
           touch release_notes.txt
           echo "## Release Notes" > release_notes.txt
           echo "This release includes the following changes:" >> release_notes.txt
-          echo "- Built kernel from commit ${{ github.sha }}" >> release_notes.txt
           echo "- Kernel Name: ${{ env.KERNEL_NAME }}" >> release_notes.txt
           echo "- Version: ${{ env.VERSION }}" >> release_notes.txt
           echo "- Device: ${{ env.DEVICE }}" >> release_notes.txt
