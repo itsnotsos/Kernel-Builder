@@ -138,13 +138,30 @@ function updateclang() {
 }
 # KernelSU function
 function kernelsu() {
-    if [ "$KERNELSU" = "yes" ];then
-          KERNEL_VARIANT="${KERNEL_VARIANT}-KernelSU"
-          if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
-             cd ${MainPath}
-             curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-             sed -i "s/CONFIG_KSU=n/CONFIG_KSU=y/g" arch/${ARCH}/configs/${DEVICE_DEFCONFIG}
-          fi
+    # Extract kernel version from Makefile
+    KERNEL_VERSION=$(grep "^VERSION =" Makefile | awk '{print $3}')
+    KERNEL_PATCHLEVEL=$(grep "^PATCHLEVEL =" Makefile | awk '{print $3}')
+    KERNEL_SUBLEVEL=$(grep "^SUBLEVEL =" Makefile | awk '{print $3}')
+    FULL_KERNEL_VERSION="${KERNEL_VERSION}.${KERNEL_PATCHLEVEL}.${KERNEL_SUBLEVEL}"
+    
+    if [ "$KERNELSU" = "yes" ]; then
+        if [ "$KERNEL_VERSION" -eq 4 ] && [ "$KERNEL_PATCHLEVEL" -eq 14 ]; then
+            # Use burhancodes/KernelSU for kernel version 4.14.xx
+            KERNEL_VARIANT="${KERNEL_VARIANT}-KernelSU"
+            if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
+                cd ${MainPath}
+                curl -LSs "https://raw.githubusercontent.com/burhancodes/KernelSU/main/kernel/setup.sh" | bash -
+                sed -i "s/CONFIG_KSU=n/CONFIG_KSU=y/g" arch/${ARCH}/configs/${DEVICE_DEFCONFIG}
+            fi
+        elif [ "$KERNEL_VERSION" -ge 5 ] && [ "$KERNEL_PATCHLEVEL" -ge 4 ]; then
+            # Use tiann/KernelSU for kernel version 5.4 and above
+            KERNEL_VARIANT="${KERNEL_VARIANT}-KernelSU"
+            if [ ! -f "${MainPath}/KernelSU/README.md" ]; then
+                cd ${MainPath}
+                curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+                sed -i "s/CONFIG_KSU=n/CONFIG_KSU=y/g" arch/${ARCH}/configs/${DEVICE_DEFCONFIG}
+            fi
+        fi
     fi
 }
 
