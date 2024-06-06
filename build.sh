@@ -150,8 +150,8 @@ function kernelsu() {
 
 # Enviromental variable
 DEVICE_MODEL="Redmi 9"
-DEVICE_CODENAME="lava"
-export DEVICE_DEFCONFIG="lava_defconfig"
+DEVICE_CODENAME="lancelot"
+export DEVICE_DEFCONFIG="lancelot_defconfig"
 export ARCH="arm64"
 export KBUILD_BUILD_USER="Aqua"
 export KBUILD_BUILD_HOST="CI"

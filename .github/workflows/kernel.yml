@@ -3,7 +3,7 @@ name: Kernel Builder
 on:
   push:
     branches:
-      - master
+      - raider
 
 jobs:
   build:
@@ -35,15 +35,15 @@ jobs:
 
       - name: Clone kernel repo
         run: |
-          git clone https://github.com/Burhanverse/kernel.git -b stable --depth=500 kernel
+          git clone https://github.com/Burhanverse/kernel.git -b raider --depth=500 kernel
           cd kernel 
-          sed -i 's/^CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="-Black"/' arch/arm64/configs/lava_defconfig
+          sed -i 's/^CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION="-Raider"/' arch/arm64/configs/lancelot_defconfig
 
       - name: Build
         run: |
           cd kernel
-          wget https://raw.githubusercontent.com/burhancodes/Kernel-Builder/master/config.env
-          wget https://raw.githubusercontent.com/burhancodes/Kernel-Builder/master/build.sh && chmod +x ./build.sh
+          wget https://raw.githubusercontent.com/burhancodes/Kernel-Builder/raider/config.env
+          wget https://raw.githubusercontent.com/burhancodes/Kernel-Builder/raider/build.sh && chmod +x ./build.sh
           echo "Building kernel"
           ./build.sh
 
